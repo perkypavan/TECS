@@ -12,39 +12,23 @@
  */
 
 CHIP PC {
-    IN in[16],load,inc,reset;
+
+    IN  in[16], load, inc, reset;
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+   
+    Inc16(in=incin, out=incout);
 
-//Logic to make the input set to Zero
-And16(a=in,b=false,out=outzero);
+    Mux16(a=incout, b=in, sel=load, out=outmux1);
+    
+    Mux16(a=outmux1, b=false, sel=reset, out=outmux2);
 
-//Logic to reset the register
-Mux16(a=in,b=outzero,out=outreset);
+    Or(a=load, b=inc, out=outor1);
+    
+    Or(a=outor1, b=reset, out=outor2);
 
-
-//Logic to enable the load of register
-Or(a=reset,b=load,out=loadreg);
-
-//Instantiate the Register
-Register(in=outreset,load=loadreg,out=outreg,out=outreginc);
-
-//Instantiate adder to increment
-Inc16(in=outreginc,out=outinc);
-
-//Mux to select incremented output
-Mux16(a=outreg,b=outinc,sel=inc,out=out);
-
-
-
-
-
+    Register(in=outmux2, load=outor2, out=incin, out=out);
 
 
 }
-
-
-
-
